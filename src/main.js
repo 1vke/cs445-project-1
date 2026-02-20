@@ -1,6 +1,12 @@
-import { createApp } from 'vue'
-import './reset.css'
-import './style.css'
+import { createApp } from 'vue';
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
 import App from './App.vue'
+import './reset.css'
 
-createApp(App).mount('#app')
+const app = createApp(App);
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    }
+});
