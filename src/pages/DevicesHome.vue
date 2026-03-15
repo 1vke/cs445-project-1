@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 import DeviceListItem from '../components/DeviceListItem.vue';
 import AddDeviceForm from '../components/AddDeviceForm.vue';
 import ManageDeviceForm from '../components/ManageDeviceForm.vue';
@@ -12,6 +14,7 @@ import { useEventStore } from '../stores/eventStore';
 
 const deviceStore = useDeviceStore();
 const eventStore = useEventStore();
+const toast = useToast();
 const { devices } = storeToRefs(deviceStore);
 
 const showAddDevice = ref(false);
@@ -38,8 +41,34 @@ function handleToggle(deviceId) {
     if (device) {
         deviceStore.toggleDevice(deviceId);
         
-        const actionText = device.isOn ? 'Turned On' : 'Turned Off';
+        let actionText = '';
+        if (device.controlType === 'toggle') actionText = device.isOn ? 'Turned On' : 'Turned Off';
+        if (device.controlType === 'lock') actionText = device.isLocked ? 'Locked' : 'Unlocked';
+
         eventStore.addEvent(device.name, actionText);
+    }
+}
+
+function handleUpdateStatus({ id, value }) {
+    const device = devices.value.find((d) => d.id === id);
+    if (device) {
+        deviceStore.updateDeviceStatus(id, value);
+        eventStore.addEvent(device.name, `Changed to ${value}°F`);
+    }
+}
+
+function handleAction(deviceId) {
+    const device = devices.value.find((d) => d.id === deviceId);
+    if (device) {
+        const action = device.actionLabel || 'Performed Action';
+        eventStore.addEvent(device.name, action);
+        
+        toast.add({
+            severity: 'info',
+            summary: device.name,
+            detail: `${action} successful`,
+            life: 3000
+        });
     }
 }
 
@@ -54,6 +83,7 @@ function handleManage(deviceId) {
 
 <template>
     <div class="devices-home flex flex-column h-full">
+        <Toast />
         <header class="app-bar flex align-items-center justify-content-between px-4 pt-5 pb-3">
             <h1 class="m-0 text-4xl font-medium text-color">Devices</h1>
             <Button icon="pi pi-plus" rounded aria-label="Add Device" @click="showAddDevice = true" />
@@ -75,6 +105,8 @@ function handleManage(deviceId) {
                             :device="device"
                             @toggle="handleToggle"
                             @manage="handleManage"
+                            @updateStatus="handleUpdateStatus"
+                            @action="handleAction"
                         />
                     </div>
                 </template>

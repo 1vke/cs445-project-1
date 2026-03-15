@@ -57,7 +57,7 @@ const themeOptions = [
                         
                         <div class="flex flex-column gap-3">
                             <label class="text-lg">Appearance</label>
-                            <SelectButton v-model="theme" :options="themeOptions" optionLabel="label" optionValue="value" class="w-full" />
+                            <SelectButton v-model="theme" :options="themeOptions" optionLabel="label" optionValue="value" :unselectable="false" class="w-full" />
                         </div>
                     </div>
                 </section>

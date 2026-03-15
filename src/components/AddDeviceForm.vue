@@ -7,6 +7,7 @@ import FloatLabel from 'primevue/floatlabel';
 import { useDeviceStore } from '../stores/deviceStore';
 import { useEventStore } from '../stores/eventStore';
 import { useSettingsStore } from '../stores/settingsStore';
+import { DEVICE_TYPES } from '../data/deviceDefinitions';
 
 const props = defineProps({
     isMobile: {
@@ -27,23 +28,19 @@ const newDevice = ref({
     location: null
 });
 
-const deviceTypes = [
-    { label: 'Socket switch', value: 'Socket switch', icon: 'pi pi-bolt' },
-    { label: 'Light bulb', value: 'Light bulb', icon: 'pi pi-lightbulb' },
-    { label: 'LED Lights', value: 'LED Lights', icon: 'pi pi-sparkles' },
-    { label: 'Air fryer', value: 'Air fryer', icon: 'pi pi-box' },
-    { label: 'Camera', value: 'Camera', icon: 'pi pi-video' },
-    { label: 'Lock', value: 'Lock', icon: 'pi pi-lock' }
-];
-
 function handleCreate() {
     if (!newDevice.value.name || !newDevice.value.type) return;
 
     const deviceData = {
         name: newDevice.value.name,
         type: newDevice.value.type.value,
+        controlType: newDevice.value.type.controlType,
+        actionLabel: newDevice.value.type.actionLabel,
         statusText: newDevice.value.location || 'Unknown location',
-        icon: newDevice.value.type.icon
+        icon: newDevice.value.type.icon,
+        value: 72,
+        isLocked: true,
+        isOn: false
     };
 
     deviceStore.addDevice(deviceData);
@@ -69,7 +66,7 @@ function handleCreate() {
                     <Select
                         id="deviceType"
                         v-model="newDevice.type"
-                        :options="deviceTypes"
+                        :options="DEVICE_TYPES"
                         optionLabel="label"
                         class="w-full"
                     >

@@ -1,13 +1,25 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { INITIAL_DEVICES } from '../data/deviceDefinitions';
 
 export const useDeviceStore = defineStore('device', () => {
-    const devices = ref([]);
+    const devices = ref(INITIAL_DEVICES);
 
     function toggleDevice(id) {
         const device = devices.value.find((d) => d.id === id);
         if (device) {
-            device.isOn = !device.isOn;
+            if (device.controlType === 'toggle') {
+                device.isOn = !device.isOn;
+            } else if (device.controlType === 'lock') {
+                device.isLocked = !device.isLocked;
+            }
+        }
+    }
+
+    function updateDeviceStatus(id, value) {
+        const device = devices.value.find((d) => d.id === id);
+        if (device) {
+            device.value = value;
         }
     }
 
@@ -15,6 +27,8 @@ export const useDeviceStore = defineStore('device', () => {
         devices.value.push({
             id: Date.now(),
             isOn: false,
+            isLocked: true,
+            value: 72,
             ...device
         });
     }
@@ -30,7 +44,14 @@ export const useDeviceStore = defineStore('device', () => {
         devices.value = devices.value.filter(d => d.id !== id);
     }
 
-    return { devices, toggleDevice, addDevice, updateDevice, removeDevice };
+    return { 
+        devices, 
+        toggleDevice, 
+        updateDeviceStatus, 
+        addDevice, 
+        updateDevice, 
+        removeDevice 
+    };
 }, {
     persist: true,
 });

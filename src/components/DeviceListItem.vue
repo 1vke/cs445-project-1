@@ -24,13 +24,15 @@
                 aria-label="Manage Device"
                 @click.stop="$emit('manage', device.id)"
             />
-            <div @click.stop="toggleStatus">
+
+            <!-- Toggle Controls (Lights, Sockets) -->
+            <div v-if="device.controlType === 'toggle'" @click.stop="$emit('toggle', device.id)">
                 <Button
-                    v-if="isActive"
+                    v-if="device.isOn"
                     icon="pi pi-sun"
                     rounded
                     severity="primary"
-                    aria-label="Toggle Device Off"
+                    aria-label="Toggle Off"
                 />
                 <Button
                     v-else
@@ -38,7 +40,58 @@
                     rounded
                     severity="secondary"
                     outlined
-                    aria-label="Toggle Device On"
+                    aria-label="Toggle On"
+                />
+            </div>
+
+            <!-- Lock Controls -->
+            <div v-else-if="device.controlType === 'lock'" @click.stop="$emit('toggle', device.id)">
+                <Button
+                    v-if="device.isLocked"
+                    icon="pi pi-lock"
+                    rounded
+                    severity="danger"
+                    aria-label="Unlock"
+                />
+                <Button
+                    v-else
+                    icon="pi pi-lock-open"
+                    rounded
+                    severity="success"
+                    aria-label="Lock"
+                />
+            </div>
+
+            <!-- Temperature Controls -->
+            <div v-else-if="device.controlType === 'temperature'" class="flex align-items-center gap-2" @click.stop>
+                <span class="text-lg font-medium mr-2">{{ device.value }}°</span>
+                <Button
+                    icon="pi pi-minus"
+                    rounded
+                    size="small"
+                    severity="secondary"
+                    outlined
+                    @click="updateTemp(-1)"
+                />
+                <Button
+                    icon="pi pi-plus"
+                    rounded
+                    size="small"
+                    severity="secondary"
+                    outlined
+                    @click="updateTemp(1)"
+                />
+            </div>
+
+            <!-- Action Controls (Camera, Air Fryer) -->
+            <div v-else-if="device.controlType === 'action'" @click.stop>
+                <Button
+                    :label="device.actionLabel || 'Action'"
+                    size="small"
+                    rounded
+                    severity="secondary"
+                    outlined
+                    @click="$emit('action', device.id)"
                 />
             </div>
         </div>
@@ -57,22 +110,27 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['toggle', 'manage']);
+const emit = defineEmits(['toggle', 'manage', 'updateStatus', 'action']);
 
 const title = computed(() => props.device.name);
-const description = computed(() => props.device.statusText || 'Offline');
+const description = computed(() => {
+    if (props.device.controlType === 'temperature') return `${props.device.statusText} • ${props.device.value}°F`;
+    if (props.device.controlType === 'lock') return `${props.device.statusText} • ${props.device.isLocked ? 'Locked' : 'Unlocked'}`;
+    if (props.device.controlType === 'toggle') return `${props.device.statusText} • ${props.device.isOn ? 'On' : 'Off'}`;
+    return props.device.statusText || 'Offline';
+});
 const icon = computed(() => props.device.icon || 'pi pi-box');
-const isActive = computed(() => props.device.isOn);
 
-function toggleStatus() {
-    emit('toggle', props.device.id);
+function updateTemp(delta) {
+    const newVal = (props.device.value || 72) + delta;
+    emit('updateStatus', { id: props.device.id, value: newVal });
 }
 </script>
 
 <style scoped>
 .device-icon {
     background-color: var(--surface-200);
-    width: 3.5rem; /* 56px */
+    width: 3.5rem;
     height: 3.5rem;
     aspect-ratio: 1 / 1;
     flex-shrink: 0;
