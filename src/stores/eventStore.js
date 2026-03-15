@@ -18,7 +18,11 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    return { events, addEvent };
+    function clearEvents() {
+        events.value = [];
+    }
+
+    return { events, addEvent, clearEvents };
 }, {
     persist: true,
 });

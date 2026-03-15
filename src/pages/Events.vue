@@ -1,10 +1,15 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import DataView from 'primevue/dataview';
+import Button from 'primevue/button';
 import { useEventStore } from '../stores/eventStore';
 
 const eventStore = useEventStore();
 const { events } = storeToRefs(eventStore);
+
+function handleClear() {
+    eventStore.clearEvents();
+}
 
 function getIcon(action) {
     if (action.toLowerCase().includes('on')) return 'pi pi-sun text-yellow-500';
@@ -15,8 +20,18 @@ function getIcon(action) {
 
 <template>
     <div class="events flex flex-column h-full">
-        <header class="app-bar px-4 pt-5 pb-3">
+        <header class="app-bar flex align-items-center justify-content-between px-4 pt-5 pb-3">
             <h1 class="m-0 text-4xl font-medium text-color">Events</h1>
+            <Button 
+                label="Clear" 
+                icon="pi pi-trash" 
+                size="small" 
+                severity="danger" 
+                text 
+                rounded
+                @click="handleClear" 
+                :disabled="events.length === 0"
+            />
         </header>
 
         <div class="events-content flex-1 overflow-y-auto pb-4">
