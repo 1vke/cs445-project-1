@@ -1,13 +1,24 @@
 <script setup>
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import SelectButton from 'primevue/selectbutton';
 import FloatLabel from 'primevue/floatlabel';
 import { useSettingsStore } from '../stores/settingsStore';
 
 const settingsStore = useSettingsStore();
-const { theme, notificationsEnabled, userName } = storeToRefs(settingsStore);
+const { theme, notificationsEnabled, userName, locations } = storeToRefs(settingsStore);
+
+const newLocationName = ref('');
+
+function handleAddLocation() {
+    if (newLocationName.value.trim()) {
+        settingsStore.addLocation(newLocationName.value.trim());
+        newLocationName.value = '';
+    }
+}
 
 const themeOptions = [
     { label: 'Light', value: 'light' },
@@ -47,6 +58,27 @@ const themeOptions = [
                         <div class="flex flex-column gap-3">
                             <label class="text-lg">Appearance</label>
                             <SelectButton v-model="theme" :options="themeOptions" optionLabel="label" optionValue="value" class="w-full" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Locations Section -->
+                <section>
+                    <h2 class="text-xl font-medium mb-4">Locations</h2>
+                    <div class="flex flex-column gap-4">
+                        <div class="flex gap-2">
+                            <FloatLabel class="flex-1">
+                                <InputText id="new-location" v-model="newLocationName" class="w-full" @keyup.enter="handleAddLocation" />
+                                <label for="new-location">New Location Name</label>
+                            </FloatLabel>
+                            <Button icon="pi pi-plus" rounded @click="handleAddLocation" :disabled="!newLocationName.trim()" />
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <div v-for="location in locations" :key="location" class="flex align-items-center gap-2 px-3 py-2 surface-100 border-round-3xl">
+                                <span>{{ location }}</span>
+                                <i class="pi pi-times-circle cursor-pointer opacity-60 hover:opacity-100" @click="settingsStore.removeLocation(location)"></i>
+                            </div>
                         </div>
                     </div>
                 </section>

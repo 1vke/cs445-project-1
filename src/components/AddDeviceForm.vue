@@ -6,6 +6,7 @@ import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
 import { useDeviceStore } from '../stores/deviceStore';
 import { useEventStore } from '../stores/eventStore';
+import { useSettingsStore } from '../stores/settingsStore';
 
 const props = defineProps({
     isMobile: {
@@ -18,11 +19,12 @@ const emit = defineEmits(['close']);
 
 const deviceStore = useDeviceStore();
 const eventStore = useEventStore();
+const settingsStore = useSettingsStore();
 
 const newDevice = ref({
     name: '',
     type: null,
-    location: ''
+    location: null
 });
 
 const deviceTypes = [
@@ -30,7 +32,6 @@ const deviceTypes = [
     { label: 'Light bulb', value: 'Light bulb', icon: 'pi pi-lightbulb' },
     { label: 'LED Lights', value: 'LED Lights', icon: 'pi pi-sparkles' },
     { label: 'Air fryer', value: 'Air fryer', icon: 'pi pi-box' },
-    { label: 'Thermostat', value: 'Thermostat', icon: 'pi pi-thermometer' },
     { label: 'Camera', value: 'Camera', icon: 'pi pi-video' },
     { label: 'Lock', value: 'Lock', icon: 'pi pi-lock' }
 ];
@@ -91,7 +92,7 @@ function handleCreate() {
                 </div>
 
                 <FloatLabel>
-                    <InputText id="location" v-model="newDevice.location" class="w-full" />
+                    <Select id="location" v-model="newDevice.location" :options="settingsStore.locations" class="w-full" />
                     <label for="location">Device location</label>
                 </FloatLabel>
             </div>

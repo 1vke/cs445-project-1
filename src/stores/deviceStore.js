@@ -2,24 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useDeviceStore = defineStore('device', () => {
-    const devices = ref([
-        {
-            id: 1,
-            name: 'Living Room Light',
-            statusText: 'Living Room',
-            icon: 'pi pi-lightbulb',
-            type: 'Light bulb',
-            isOn: true,
-        },
-        {
-            id: 2,
-            name: 'Kitchen Thermostat',
-            statusText: 'Kitchen',
-            icon: 'pi pi-thermometer',
-            type: 'Thermostat',
-            isOn: false,
-        },
-    ]);
+    const devices = ref([]);
 
     function toggleDevice(id) {
         const device = devices.value.find((d) => d.id === id);
@@ -36,11 +19,18 @@ export const useDeviceStore = defineStore('device', () => {
         });
     }
 
+    function updateDevice(id, updatedData) {
+        const index = devices.value.findIndex(d => d.id === id);
+        if (index !== -1) {
+            devices.value[index] = { ...devices.value[index], ...updatedData };
+        }
+    }
+
     function removeDevice(id) {
         devices.value = devices.value.filter(d => d.id !== id);
     }
 
-    return { devices, toggleDevice, addDevice, removeDevice };
+    return { devices, toggleDevice, addDevice, updateDevice, removeDevice };
 }, {
     persist: true,
 });

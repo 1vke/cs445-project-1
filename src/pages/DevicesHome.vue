@@ -6,6 +6,7 @@ import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
 import DeviceListItem from '../components/DeviceListItem.vue';
 import AddDeviceForm from '../components/AddDeviceForm.vue';
+import ManageDeviceForm from '../components/ManageDeviceForm.vue';
 import { useDeviceStore } from '../stores/deviceStore';
 import { useEventStore } from '../stores/eventStore';
 
@@ -14,6 +15,8 @@ const eventStore = useEventStore();
 const { devices } = storeToRefs(deviceStore);
 
 const showAddDevice = ref(false);
+const showManageDevice = ref(false);
+const selectedDevice = ref(null);
 const windowWidth = ref(window.innerWidth);
 
 const isMobile = computed(() => windowWidth.value <= 768);
@@ -37,6 +40,14 @@ function handleToggle(deviceId) {
         
         const actionText = device.isOn ? 'Turned On' : 'Turned Off';
         eventStore.addEvent(device.name, actionText);
+    }
+}
+
+function handleManage(deviceId) {
+    const device = devices.value.find((d) => d.id === deviceId);
+    if (device) {
+        selectedDevice.value = device;
+        showManageDevice.value = true;
     }
 }
 </script>
@@ -63,6 +74,7 @@ function handleToggle(deviceId) {
                             :key="device.id"
                             :device="device"
                             @toggle="handleToggle"
+                            @manage="handleManage"
                         />
                     </div>
                 </template>
@@ -87,6 +99,28 @@ function handleToggle(deviceId) {
                 v-if="isMobile && showAddDevice" 
                 :isMobile="true" 
                 @close="showAddDevice = false" 
+            />
+        </Transition>
+
+        <!-- Manage Device Modal/Page -->
+        <Dialog 
+            v-if="!isMobile"
+            v-model:visible="showManageDevice" 
+            modal 
+            :closable="false"
+            :showHeader="false"
+            :style="{ width: '450px' }"
+            class="p-0 overflow-hidden"
+        >
+            <ManageDeviceForm v-if="selectedDevice" :device="selectedDevice" :isMobile="false" @close="showManageDevice = false" />
+        </Dialog>
+
+        <Transition name="slide-up">
+            <ManageDeviceForm 
+                v-if="isMobile && showManageDevice" 
+                :device="selectedDevice"
+                :isMobile="true" 
+                @close="showManageDevice = false" 
             />
         </Transition>
     </div>

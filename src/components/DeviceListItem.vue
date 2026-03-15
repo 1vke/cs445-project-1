@@ -15,22 +15,32 @@
             </div>
         </div>
 
-        <div class="action-container" @click.stop="toggleStatus">
+        <div class="action-container flex align-items-center gap-2">
             <Button
-                v-if="isActive"
-                icon="pi pi-sun"
-                rounded
-                severity="primary"
-                aria-label="Toggle Device Off"
-            />
-            <Button
-                v-else
-                icon="pi pi-moon"
+                icon="pi pi-ellipsis-v"
+                text
                 rounded
                 severity="secondary"
-                outlined
-                aria-label="Toggle Device On"
+                aria-label="Manage Device"
+                @click.stop="$emit('manage', device.id)"
             />
+            <div @click.stop="toggleStatus">
+                <Button
+                    v-if="isActive"
+                    icon="pi pi-sun"
+                    rounded
+                    severity="primary"
+                    aria-label="Toggle Device Off"
+                />
+                <Button
+                    v-else
+                    icon="pi pi-moon"
+                    rounded
+                    severity="secondary"
+                    outlined
+                    aria-label="Toggle Device On"
+                />
+            </div>
         </div>
     </div>
     <div class="border-bottom-1 surface-border mx-3"></div>
@@ -47,7 +57,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['toggle']);
+const emit = defineEmits(['toggle', 'manage']);
 
 const title = computed(() => props.device.name);
 const description = computed(() => props.device.statusText || 'Offline');
