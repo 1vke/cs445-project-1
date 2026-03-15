@@ -60,10 +60,7 @@ function handleDelete() {
 <template>
     <div :class="['manage-device-form flex flex-column', { 'h-full': isMobile }]">
         <header class="app-bar flex align-items-center justify-content-between px-4 pt-5 pb-3">
-            <div class="flex align-items-center gap-2">
-                <Button v-if="isMobile" icon="pi pi-chevron-left" text rounded @click="$emit('close')" aria-label="Back" />
-                <h1 class="m-0 text-2xl font-medium text-color">Manage device</h1>
-            </div>
+            <h1 class="m-0 text-2xl font-medium text-color">Manage device</h1>
             <Button icon="pi pi-times" text rounded @click="$emit('close')" aria-label="Close" />
         </header>
 
