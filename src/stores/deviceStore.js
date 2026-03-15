@@ -6,36 +6,17 @@ export const useDeviceStore = defineStore('device', () => {
         {
             id: 1,
             name: 'Living Room Light',
-            statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-            icon: 'pi pi-image',
+            statusText: 'Living Room',
+            icon: 'pi pi-lightbulb',
+            type: 'Light bulb',
             isOn: true,
         },
         {
             id: 2,
             name: 'Kitchen Thermostat',
-            statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-            icon: 'pi pi-image',
-            isOn: false,
-        },
-        {
-            id: 3,
-            name: 'Bedroom Light',
-            statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-            icon: 'pi pi-image',
-            isOn: true,
-        },
-        {
-            id: 4,
-            name: 'Front Door Lock',
-            statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-            icon: 'pi pi-image',
-            isOn: false,
-        },
-        {
-            id: 5,
-            name: 'Garage Camera',
-            statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-            icon: 'pi pi-image',
+            statusText: 'Kitchen',
+            icon: 'pi pi-thermometer',
+            type: 'Thermostat',
             isOn: false,
         },
     ]);
@@ -47,7 +28,19 @@ export const useDeviceStore = defineStore('device', () => {
         }
     }
 
-    return { devices, toggleDevice };
+    function addDevice(device) {
+        devices.value.push({
+            id: Date.now(),
+            isOn: false,
+            ...device
+        });
+    }
+
+    function removeDevice(id) {
+        devices.value = devices.value.filter(d => d.id !== id);
+    }
+
+    return { devices, toggleDevice, addDevice, removeDevice };
 }, {
     persist: true,
 });
