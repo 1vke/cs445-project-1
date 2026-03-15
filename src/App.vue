@@ -1,5 +1,33 @@
 <script setup>
+import { watch, onMounted } from 'vue';
+import { useSettingsStore } from './stores/settingsStore';
 import AppNavigation from './components/layout/AppNavigation.vue';
+
+const settingsStore = useSettingsStore();
+
+watch(() => settingsStore.theme, (newTheme) => {
+    applyTheme(newTheme);
+}, { immediate: true });
+
+function applyTheme(theme) {
+    const html = document.documentElement;
+    if (theme === 'dark') {
+        html.classList.add('app-dark');
+    } else if (theme === 'light') {
+        html.classList.remove('app-dark');
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            html.classList.add('app-dark');
+        } else {
+            html.classList.remove('app-dark');
+        }
+    }
+}
+
+onMounted(() => {
+    applyTheme(settingsStore.theme);
+});
 </script>
 
 <template>

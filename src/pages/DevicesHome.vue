@@ -1,51 +1,22 @@
 <script setup>
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import DataView from 'primevue/dataview';
 import DeviceListItem from '../components/DeviceListItem.vue';
+import { useDeviceStore } from '../stores/deviceStore';
+import { useEventStore } from '../stores/eventStore';
 
-const devicesStore = ref([
-    {
-        id: 1,
-        name: 'Living Room Light',
-        statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-        icon: 'pi pi-image',
-        isOn: true,
-    },
-    {
-        id: 2,
-        name: 'Kitchen Thermostat',
-        statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-        icon: 'pi pi-image',
-        isOn: false,
-    },
-    {
-        id: 3,
-        name: 'Bedroom Light',
-        statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-        icon: 'pi pi-image',
-        isOn: true,
-    },
-    {
-        id: 4,
-        name: 'Front Door Lock',
-        statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-        icon: 'pi pi-image',
-        isOn: false,
-    },
-    {
-        id: 5,
-        name: 'Garage Camera',
-        statusText: 'Supporting line text lorem ipsum dolor sit amet.',
-        icon: 'pi pi-image',
-        isOn: false,
-    },
-]);
+const deviceStore = useDeviceStore();
+const eventStore = useEventStore();
+const { devices } = storeToRefs(deviceStore);
 
 function handleToggle(deviceId) {
-    const device = devicesStore.value.find((d) => d.id === deviceId);
+    const device = devices.value.find((d) => d.id === deviceId);
     if (device) {
-        device.isOn = !device.isOn;
+        deviceStore.toggleDevice(deviceId);
+        
+        const actionText = device.isOn ? 'Turned On' : 'Turned Off';
+        eventStore.addEvent(device.name, actionText);
     }
 }
 </script>
@@ -58,7 +29,7 @@ function handleToggle(deviceId) {
         </header>
 
         <div class="device-list flex-1 overflow-y-auto pb-4">
-            <DataView :value="devicesStore" layout="list">
+            <DataView :value="devices" layout="list">
                 <template #list="slotProps">
                     <div class="flex flex-column">
                         <DeviceListItem
