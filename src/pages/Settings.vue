@@ -9,7 +9,7 @@ import FloatLabel from 'primevue/floatlabel';
 import { useSettingsStore } from '../stores/settingsStore';
 
 const settingsStore = useSettingsStore();
-const { theme, notificationsEnabled, userName, locations } = storeToRefs(settingsStore);
+const { theme, notificationsEnabled, userName, locations, accentColor } = storeToRefs(settingsStore);
 
 const newLocationName = ref('');
 
@@ -24,6 +24,15 @@ const themeOptions = [
     { label: 'Light', value: 'light' },
     { label: 'Dark', value: 'dark' },
     { label: 'Auto', value: 'auto' }
+];
+
+const accentColorOptions = [
+    { label: 'Green', value: 'emerald' },
+    { label: 'Blue', value: 'blue' },
+    { label: 'Indigo', value: 'indigo' },
+    { label: 'Purple', value: 'purple' },
+    { label: 'Orange', value: 'orange' },
+    { label: 'Red', value: 'red' }
 ];
 </script>
 
@@ -57,7 +66,11 @@ const themeOptions = [
                         
                         <div class="flex flex-column gap-3">
                             <label class="text-lg">Appearance</label>
-                            <SelectButton v-model="theme" :options="themeOptions" optionLabel="label" optionValue="value" :unselectable="false" class="w-full" />
+                            <SelectButton v-model="theme" :options="themeOptions" optionLabel="label" optionValue="value" :allow-empty="false" class="w-full" />
+                        </div>
+                        <div class="flex flex-column gap-3">
+                            <label class="text-lg">Accent Color</label>
+                            <SelectButton v-model="accentColor" :options="accentColorOptions" optionLabel="label" optionValue="value" :allow-empty="false" class="w-full" />
                         </div>
                     </div>
                 </section>

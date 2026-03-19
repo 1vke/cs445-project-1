@@ -2,11 +2,16 @@
 import { watch, onMounted } from 'vue';
 import { useSettingsStore } from './stores/settingsStore';
 import AppNavigation from './components/layout/AppNavigation.vue';
+import { updatePrimaryPalette } from '@primeuix/themes';
 
 const settingsStore = useSettingsStore();
 
 watch(() => settingsStore.theme, (newTheme) => {
     applyTheme(newTheme);
+}, { immediate: true });
+
+watch(() => settingsStore.accentColor, (newColor) => {
+    applyAccentColor(newColor);
 }, { immediate: true });
 
 function applyTheme(theme) {
@@ -25,8 +30,25 @@ function applyTheme(theme) {
     }
 }
 
+function applyAccentColor(colorName) {
+    updatePrimaryPalette({
+        50: `{${colorName}.50}`,
+        100: `{${colorName}.100}`,
+        200: `{${colorName}.200}`,
+        300: `{${colorName}.300}`,
+        400: `{${colorName}.400}`,
+        500: `{${colorName}.500}`,
+        600: `{${colorName}.600}`,
+        700: `{${colorName}.700}`,
+        800: `{${colorName}.800}`,
+        900: `{${colorName}.900}`,
+        950: `{${colorName}.950}`
+    });
+}
+
 onMounted(() => {
     applyTheme(settingsStore.theme);
+    applyAccentColor(settingsStore.accentColor);
 });
 </script>
 
