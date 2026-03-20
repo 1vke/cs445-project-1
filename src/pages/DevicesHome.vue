@@ -9,16 +9,20 @@ import { useToast } from 'primevue/usetoast';
 import DeviceListItem from '../components/DeviceListItem.vue';
 import AddDeviceForm from '../components/AddDeviceForm.vue';
 import ManageDeviceForm from '../components/ManageDeviceForm.vue';
+import OnboardingFlow from '../components/OnboardingFlow.vue';
 import { useDeviceStore } from '../stores/deviceStore';
 import { useEventStore } from '../stores/eventStore';
+import { useSettingsStore } from '../stores/settingsStore';
 
 const deviceStore = useDeviceStore();
 const eventStore = useEventStore();
+const settingsStore = useSettingsStore();
 const toast = useToast();
 const { devices } = storeToRefs(deviceStore);
 
 const showAddDevice = ref(false);
 const showManageDevice = ref(false);
+const showOnboarding = ref(!settingsStore.hasCompletedOnboarding);
 const selectedDevice = ref(null);
 const windowWidth = ref(window.innerWidth);
 
@@ -26,6 +30,11 @@ const isMobile = computed(() => windowWidth.value <= 768);
 
 function updateWidth() {
     windowWidth.value = window.innerWidth;
+}
+
+function handleOnboardingComplete() {
+    showOnboarding.value = false;
+    showAddDevice.value = true;
 }
 
 onMounted(() => {
@@ -90,10 +99,11 @@ function handleManage(deviceId) {
         </header>
 
         <div class="device-list flex-1 overflow-y-auto pb-4">
-            <div v-if="devices.length === 0" class="flex flex-column align-items-center justify-content-center h-full text-secondary py-8">
-                <i class="pi pi-plus-circle text-6xl mb-3 opacity-50"></i>
-                <p class="text-xl">No devices added yet.</p>
-                <p class="text-sm opacity-70 text-center px-4">Tap the + button to add your first smart device.</p>
+            <div v-if="devices.length === 0" class="flex flex-column align-items-center justify-content-center h-full text-secondary py-8 px-4 text-center">
+                <i class="pi pi-plus-circle text-6xl mb-3 text-primary opacity-80"></i>
+                <p class="text-xl font-medium mb-2">You don't have any devices yet.</p>
+                <p class="text-sm opacity-70 mb-4">Add one to get started and take control of your smart home!</p>
+                <Button label="Add Device" icon="pi pi-plus" rounded @click="showAddDevice = true" />
             </div>
 
             <DataView v-else :value="devices" layout="list">
@@ -121,6 +131,7 @@ function handleManage(deviceId) {
             :closable="false"
             :showHeader="false"
             :style="{ width: '450px' }"
+            :pt="{ content: { class: 'p-0' } }"
             class="p-0 overflow-hidden"
         >
             <AddDeviceForm :isMobile="false" @close="showAddDevice = false" />
@@ -142,6 +153,7 @@ function handleManage(deviceId) {
             :closable="false"
             :showHeader="false"
             :style="{ width: '450px' }"
+            :pt="{ content: { class: 'p-0' } }"
             class="p-0 overflow-hidden"
         >
             <ManageDeviceForm v-if="selectedDevice" :device="selectedDevice" :isMobile="false" @close="showManageDevice = false" />
@@ -153,6 +165,27 @@ function handleManage(deviceId) {
                 :device="selectedDevice"
                 :isMobile="true" 
                 @close="showManageDevice = false" 
+            />
+        </Transition>
+
+        <Dialog 
+            v-if="!isMobile"
+            v-model:visible="showOnboarding"
+            modal 
+            :closable="false"
+            :showHeader="false"
+            :style="{ width: '450px' }"
+            :pt="{ content: { class: 'p-0' } }"
+            class="p-0 overflow-hidden"
+        >
+            <OnboardingFlow :isMobile="false" @complete="handleOnboardingComplete" />
+        </Dialog>
+
+        <Transition name="slide-up">
+            <OnboardingFlow 
+                v-if="isMobile && showOnboarding" 
+                :isMobile="true" 
+                @complete="handleOnboardingComplete" 
             />
         </Transition>
     </div>

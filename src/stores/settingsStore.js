@@ -6,6 +6,7 @@ export const useSettingsStore = defineStore('settings', () => {
     const accentColor = ref('emerald');
     const notificationsEnabled = ref(true);
     const userName = ref('User');
+    const hasCompletedOnboarding = ref(false);
     const locations = ref(['Living room', 'Kitchen', 'Master bedroom', 'Guest bedroom', 'Bathroom', 'Garage']);
 
     function updateTheme(newTheme) {
@@ -24,6 +25,10 @@ export const useSettingsStore = defineStore('settings', () => {
         userName.value = name;
     }
 
+    function completeOnboarding() {
+        hasCompletedOnboarding.value = true;
+    }
+
     function addLocation(location) {
         if (location && !locations.value.includes(location)) {
             locations.value.push(location);
@@ -39,11 +44,13 @@ export const useSettingsStore = defineStore('settings', () => {
         accentColor,
         notificationsEnabled, 
         userName, 
+        hasCompletedOnboarding,
         locations,
         updateTheme, 
         updateAccentColor,
         toggleNotifications, 
         updateUserName,
+        completeOnboarding,
         addLocation,
         removeLocation
     };
